@@ -1,2 +1,3 @@
-# ARDRUMINO
-Arduino based drum-sample machine
+# ARD*SEQU*INO (WIP)
+
+An Arduino based sequencer and sample player.
