@@ -20,17 +20,12 @@ SX1509 SX1509_io;
 
 volatile bool prev_enc_0_ch0_state;
 volatile bool prev_enc_0_ch1_state;
-volatile bool prev_enc_0_sw_state;
 
 volatile bool prev_enc_1_ch0_state;
 volatile bool prev_enc_1_ch1_state;
-volatile bool prev_enc_1_sw_state;
 
 volatile bool prev_enc_2_ch0_state;
 volatile bool prev_enc_2_ch1_state;
-volatile bool prev_enc_2_sw_state;
-
-volatile bool prev_sw_0_state;
 
 volatile int8_t enc_draw_pos;
 
@@ -47,6 +42,43 @@ volatile int prev_anlg_pot2_state;
 volatile int prev_anlg_pot3_state;
 
 volatile unsigned long prev_pot_time;
+
+// interrupt flags
+volatile bool sx1509_int_flag = false;
+volatile bool sw_0_flag = false;
+volatile bool enc_0_knob_flag = false;
+volatile bool enc_0_sw_flag = false;
+volatile bool enc_1_knob_flag = false;
+volatile bool enc_1_sw_flag = false;
+volatile bool enc_2_knob_flag = false;
+volatile bool enc_2_sw_flag = false;
+
+// Debounce trackers
+volatile unsigned long sx1509_sw_0_last_trig = millis();
+volatile unsigned long sx1509_sw_1_last_trig = millis();
+volatile unsigned long sx1509_sw_2_last_trig = millis();
+volatile unsigned long sx1509_sw_3_last_trig = millis();
+volatile unsigned long sx1509_sw_4_last_trig = millis();
+volatile unsigned long sx1509_sw_5_last_trig = millis();
+volatile unsigned long sx1509_sw_6_last_trig = millis();
+volatile unsigned long sx1509_sw_7_last_trig = millis();
+volatile unsigned long sx1509_sw_8_last_trig = millis();
+volatile unsigned long sx1509_sw_9_last_trig = millis();
+volatile unsigned long sx1509_sw_10_last_trig = millis();
+volatile unsigned long sx1509_sw_11_last_trig = millis();
+volatile unsigned long sx1509_sw_12_last_trig = millis();
+volatile unsigned long sx1509_sw_13_last_trig = millis();
+volatile unsigned long sx1509_sw_14_last_trig = millis();
+volatile unsigned long sx1509_sw_15_last_trig = millis();
+volatile unsigned long NANO_sw_0_last_trig = millis();
+volatile unsigned long enc_0_sw_last_trig = millis();
+volatile unsigned long enc_0_knob_last_trig = millis();
+volatile unsigned long enc_1_sw_last_trig = millis();
+volatile unsigned long enc_1_knob_last_trig = millis();
+volatile unsigned long enc_2_sw_last_trig = millis();
+volatile unsigned long enc_2_knob_last_trig = millis();
+
+
 
 void setup()
 {
@@ -93,52 +125,47 @@ void setup()
 
     prev_enc_0_ch0_state = digitalRead(NANO_enc0_ch0);
     prev_enc_0_ch1_state = digitalRead(NANO_enc0_ch1);
-    prev_enc_0_sw_state = digitalRead(NANO_enc0_sw);
 
     prev_enc_1_ch0_state = digitalRead(NANO_enc1_ch0);
     prev_enc_1_ch1_state = digitalRead(NANO_enc1_ch1);
-    prev_enc_1_sw_state = digitalRead(NANO_enc1_sw);
 
     prev_enc_2_ch0_state = digitalRead(NANO_enc2_ch0);
     prev_enc_2_ch1_state = digitalRead(NANO_enc2_ch1);
-    prev_enc_2_sw_state = digitalRead(NANO_enc2_sw);
-
-    prev_sw_0_state = digitalRead(NANO_sw0_pin);
 
     // Use a pull-up resistor on the button's input pin. When
-    // the button is pressed, the pin will be read as LOW:
+    // the button is trig, the pin will be read as LOW:
     SX1509_io.pinMode(SX1509_sw0_pin, INPUT_PULLUP);
-    SX1509_io.enableInterrupt(SX1509_sw0_pin, RISING);
+    SX1509_io.enableInterrupt(SX1509_sw0_pin, CHANGE);
     SX1509_io.pinMode(SX1509_sw1_pin, INPUT_PULLUP);
-    SX1509_io.enableInterrupt(SX1509_sw1_pin, RISING);
+    SX1509_io.enableInterrupt(SX1509_sw1_pin, CHANGE);
     SX1509_io.pinMode(SX1509_sw2_pin, INPUT_PULLUP);
-    SX1509_io.enableInterrupt(SX1509_sw2_pin, RISING);
+    SX1509_io.enableInterrupt(SX1509_sw2_pin, CHANGE);
     SX1509_io.pinMode(SX1509_sw3_pin, INPUT_PULLUP);
-    SX1509_io.enableInterrupt(SX1509_sw3_pin, RISING);
+    SX1509_io.enableInterrupt(SX1509_sw3_pin, CHANGE);
     SX1509_io.pinMode(SX1509_sw4_pin, INPUT_PULLUP);
-    SX1509_io.enableInterrupt(SX1509_sw4_pin, RISING);
+    SX1509_io.enableInterrupt(SX1509_sw4_pin, CHANGE);
     SX1509_io.pinMode(SX1509_sw5_pin, INPUT_PULLUP);
-    SX1509_io.enableInterrupt(SX1509_sw5_pin, RISING);
+    SX1509_io.enableInterrupt(SX1509_sw5_pin, CHANGE);
     SX1509_io.pinMode(SX1509_sw6_pin, INPUT_PULLUP);
-    SX1509_io.enableInterrupt(SX1509_sw6_pin, RISING);
+    SX1509_io.enableInterrupt(SX1509_sw6_pin, CHANGE);
     SX1509_io.pinMode(SX1509_sw7_pin, INPUT_PULLUP);
-    SX1509_io.enableInterrupt(SX1509_sw7_pin, RISING);
+    SX1509_io.enableInterrupt(SX1509_sw7_pin, CHANGE);
     SX1509_io.pinMode(SX1509_sw8_pin, INPUT_PULLUP);
-    SX1509_io.enableInterrupt(SX1509_sw8_pin, RISING);
+    SX1509_io.enableInterrupt(SX1509_sw8_pin, CHANGE);
     SX1509_io.pinMode(SX1509_sw9_pin, INPUT_PULLUP);
-    SX1509_io.enableInterrupt(SX1509_sw9_pin, RISING);
+    SX1509_io.enableInterrupt(SX1509_sw9_pin, CHANGE);
     SX1509_io.pinMode(SX1509_sw10_pin, INPUT_PULLUP);
-    SX1509_io.enableInterrupt(SX1509_sw10_pin, RISING);
+    SX1509_io.enableInterrupt(SX1509_sw10_pin, CHANGE);
     SX1509_io.pinMode(SX1509_sw11_pin, INPUT_PULLUP);
-    SX1509_io.enableInterrupt(SX1509_sw11_pin, RISING);
+    SX1509_io.enableInterrupt(SX1509_sw11_pin, CHANGE);
     SX1509_io.pinMode(SX1509_sw12_pin, INPUT_PULLUP);
-    SX1509_io.enableInterrupt(SX1509_sw12_pin, RISING);
+    SX1509_io.enableInterrupt(SX1509_sw12_pin, CHANGE);
     SX1509_io.pinMode(SX1509_sw13_pin, INPUT_PULLUP);
-    SX1509_io.enableInterrupt(SX1509_sw13_pin, RISING);
+    SX1509_io.enableInterrupt(SX1509_sw13_pin, CHANGE);
     SX1509_io.pinMode(SX1509_sw14_pin, INPUT_PULLUP);
-    SX1509_io.enableInterrupt(SX1509_sw14_pin, RISING);
+    SX1509_io.enableInterrupt(SX1509_sw14_pin, FALLING);
     SX1509_io.pinMode(SX1509_sw15_pin, INPUT_PULLUP);
-    SX1509_io.enableInterrupt(SX1509_sw15_pin, RISING);
+    SX1509_io.enableInterrupt(SX1509_sw15_pin, FALLING);
 
     prev_anlg_pot0_state = analogRead(A0);
     prev_anlg_pot1_state = analogRead(A1);
@@ -163,64 +190,120 @@ void setup()
     attachInterrupt(digitalPinToInterrupt(SX1509_int_pin), sx1509_interrupt, FALLING);
 }
 
+ISR (PCINT0_vect)
+{
+    if ((digitalRead(NANO_enc2_ch0) != prev_enc_2_ch0_state) || (digitalRead(NANO_enc2_ch1) != prev_enc_2_ch1_state)) {
+        enc_2_knob_flag = true;
+        prev_enc_2_ch0_state = digitalRead(NANO_enc2_ch0);
+        prev_enc_2_ch1_state = digitalRead(NANO_enc2_ch1);
+        enc_2_knob_last_trig = millis();
+    }
+
+    if (digitalRead(NANO_enc2_sw) == LOW) {
+        enc_2_sw_flag = true;
+        memset(enc_usage_tracker, false, sizeof(enc_usage_tracker));
+    }
+
+    if (digitalRead(NANO_enc1_sw) == LOW) {
+        enc_1_sw_flag = true;
+        memset(enc_usage_tracker, false, sizeof(enc_usage_tracker));
+    }
+
+    if (digitalRead(NANO_sw0_pin) == LOW && sw_0_flag == false) {
+        sw_0_flag = true;
+        memset(enc_usage_tracker, false, sizeof(enc_usage_tracker));
+    }
+}
+
+ISR (PCINT2_vect)
+{    
+    if ((digitalRead(NANO_enc0_ch0) != prev_enc_0_ch0_state) || (digitalRead(NANO_enc0_ch1) != prev_enc_0_ch1_state)) {
+        enc_0_knob_flag = true;
+        prev_enc_0_ch0_state = digitalRead(NANO_enc0_ch0);
+        prev_enc_0_ch1_state = digitalRead(NANO_enc0_ch1);
+        enc_0_knob_last_trig = millis();
+    }
+
+    if ((digitalRead(NANO_enc1_ch0) != prev_enc_1_ch0_state) || (digitalRead(NANO_enc1_ch1) != prev_enc_1_ch1_state)) {
+        enc_1_knob_flag = true;
+        prev_enc_1_ch0_state = digitalRead(NANO_enc1_ch0);
+        prev_enc_1_ch1_state = digitalRead(NANO_enc1_ch1);
+        enc_1_knob_last_trig = millis();
+    }
+
+    if (digitalRead(NANO_enc0_sw) == LOW) {
+        enc_0_sw_flag = true;
+        memset(enc_usage_tracker, false, sizeof(enc_usage_tracker));
+    }
+}
+
+void sx1509_interrupt()
+{
+    memset(enc_usage_tracker, false, sizeof(enc_usage_tracker));
+    sx1509_int_flag = true;
+}
+
+void sw_0_run()
+{
+    if ((millis() - NANO_sw_0_last_trig) > sw_debounce_time) {
+        sw_0_flag = false;
+        draw_image(sw0_bmp);
+        uint16_t unstuck_sx1509_int = SX1509_io.interruptSource(); // sx1509 inputs seem to get overwhelmed when spammed rapidly
+        NANO_sw_0_last_trig = millis();
+    }
+}
+
+void enc_0_sw_run()
+{
+    if ((millis() - enc_0_sw_last_trig) > sw_debounce_time) {
+        enc_0_sw_flag = false;
+        draw_image(enc0_bmp);
+        enc_0_sw_last_trig = millis();
+    }
+}
+
+void enc_0_knob_run()
+{
+    enc_0_knob_flag = false;
+    read_encoder(NANO_enc0_ch0, NANO_enc0_ch1, 0);
+}
+
+void enc_1_sw_run()
+{
+    if ((millis() - enc_1_sw_last_trig) > sw_debounce_time) {
+        enc_1_sw_flag = false;
+        draw_image(enc1_bmp);
+        enc_1_sw_last_trig = millis();
+    }
+}
+
+void enc_1_knob_run()
+{
+    enc_1_knob_flag = false;
+    read_encoder(NANO_enc1_ch0, NANO_enc1_ch1, 1);
+}
+
+void enc_2_sw_run()
+{
+    if ((millis() - enc_2_sw_last_trig) > sw_debounce_time) {
+        enc_2_sw_flag = false;
+        draw_image(enc2_bmp);
+        enc_2_sw_last_trig = millis();
+    }
+}
+
+void enc_2_knob_run()
+{
+    enc_2_knob_flag = false;
+    read_encoder(NANO_enc2_ch0, NANO_enc2_ch1, 2);
+}
+
 void draw_image(const uint8_t *bitmap)
 {
     matrix.setRotation(3);
     matrix.clear();
     matrix.drawBitmap(0, 0, bitmap, 16, 8, LED_ON);
     matrix.writeDisplay();  // write the changes we just made to the display
-}
-
-ISR (PCINT0_vect)
-{
-    interrupts();
-
-    if ((digitalRead(NANO_enc2_ch0) != prev_enc_2_ch0_state) || (digitalRead(NANO_enc2_ch1) != prev_enc_2_ch1_state)) {
-        read_encoder(NANO_enc2_ch0, NANO_enc2_ch1, 2);
-        prev_enc_2_ch0_state = digitalRead(NANO_enc2_ch0);
-        prev_enc_2_ch1_state = digitalRead(NANO_enc2_ch1);
-    }
-
-    if (digitalRead(NANO_enc2_sw) != prev_enc_2_sw_state) {
-        memset(enc_usage_tracker, false, sizeof(enc_usage_tracker));
-        draw_image(enc2_bmp);
-        prev_enc_2_sw_state = digitalRead(NANO_enc2_sw);
-    }
-
-    if (digitalRead(NANO_enc1_sw) != prev_enc_1_sw_state) {
-        memset(enc_usage_tracker, false, sizeof(enc_usage_tracker));
-        draw_image(enc1_bmp);
-        prev_enc_1_sw_state = digitalRead(NANO_enc1_sw);
-    }
-
-    if (digitalRead(NANO_sw0_pin) != prev_sw_0_state) {
-        memset(enc_usage_tracker, false, sizeof(enc_usage_tracker));
-        draw_image(sw0_bmp);
-        prev_sw_0_state = digitalRead(NANO_sw0_pin);
-    }
-}
-
-ISR (PCINT2_vect)
-{
-    interrupts();
-    
-    if ((digitalRead(NANO_enc0_ch0) != prev_enc_0_ch0_state) || (digitalRead(NANO_enc0_ch1) != prev_enc_0_ch1_state)) {
-        read_encoder(NANO_enc0_ch0, NANO_enc0_ch1, 0);
-        prev_enc_0_ch0_state = digitalRead(NANO_enc0_ch0);
-        prev_enc_0_ch1_state = digitalRead(NANO_enc0_ch1);
-    }
-
-    if ((digitalRead(NANO_enc1_ch0) != prev_enc_1_ch0_state) || (digitalRead(NANO_enc1_ch1) != prev_enc_1_ch1_state)) {
-        read_encoder(NANO_enc1_ch0, NANO_enc1_ch1, 1);
-        prev_enc_1_ch0_state = digitalRead(NANO_enc1_ch0);
-        prev_enc_1_ch1_state = digitalRead(NANO_enc1_ch1);
-    }
-
-    if (digitalRead(NANO_enc0_sw) != prev_enc_0_sw_state) {
-        memset(enc_usage_tracker, false, sizeof(enc_usage_tracker));
-        draw_image(enc0_bmp);
-        prev_enc_0_sw_state = digitalRead(NANO_enc0_sw);
-    }
 }
 
 void encoder_led_mapping(uint8_t enc_num, bool direction) // true for clockwise, false for counter clockwise
@@ -333,44 +416,52 @@ void read_encoder(int enc_ch0, int enc_ch1, uint8_t enc_num)
     }
 }
 
-void sx1509_interrupt() {
-    interrupts();
-    memset(enc_usage_tracker, false, sizeof(enc_usage_tracker));
+void sx1509_sw_read()
+{
+    sx1509_int_flag = false;
     uint16_t intSrc = SX1509_io.interruptSource();
-    if (intSrc == 1) {
-        draw_image(sw_1_bmp);
-    } else if (intSrc == 2) {
-        draw_image(sw_2_bmp);
-    } else if (intSrc == 4) {
-        draw_image(sw_3_bmp);
-    } else if (intSrc == 8) {
-        draw_image(sw_4_bmp);
-    } else if (intSrc == 16) {
-        draw_image(sw_5_bmp);
-    } else if (intSrc == 32) {
-        draw_image(sw_6_bmp);
-    } else if (intSrc == 64) {
-        draw_image(sw_7_bmp);
-    } else if (intSrc == 128) {
-        draw_image(sw_8_bmp);
-    } else if (intSrc == 256) {
-        draw_image(sw_9_bmp);
-    } else if (intSrc == 512) {
-        draw_image(sw_10_bmp);
-    } else if (intSrc == 1024) {
-        draw_image(sw_11_bmp);
-    } else if (intSrc == 2048) {
-        draw_image(sw_12_bmp);
-    } else if (intSrc == 4096) {
-        draw_image(sw_13_bmp);
-    } else if (intSrc == 8192) {
-        draw_image(sw_14_bmp);
-    } else if (intSrc == 16384) {
-        draw_image(sw_15_bmp);
-    } else if (intSrc == 32768) {
-        draw_image(sw_16_bmp);
-    } else {
-        draw_image(err_bmp);
+
+    if ((millis() - sx1509_sw_0_last_trig) > sw_debounce_time) {
+        if (intSrc == 0x0001) {
+            draw_image(sw_1_bmp);
+        } else if (intSrc == 0x0002) {
+            draw_image(sw_2_bmp);
+        } else if (intSrc == 0x0004) {
+            draw_image(sw_3_bmp);
+        } else if (intSrc == 0x0008) {
+            draw_image(sw_4_bmp);
+        } else if (intSrc == 0x0010) {
+            draw_image(sw_5_bmp);
+        } else if (intSrc == 0x0020) {
+            draw_image(sw_6_bmp);
+        } else if (intSrc == 0x0040) {
+            draw_image(sw_7_bmp);
+        } else if (intSrc == 0x0080) {
+            draw_image(sw_8_bmp);
+        } else if (intSrc == 0x0100) {
+            draw_image(sw_9_bmp);
+        } else if (intSrc == 0x0200) {
+            draw_image(sw_10_bmp);
+        } else if (intSrc == 0x0400) {
+            draw_image(sw_11_bmp);
+        } else if (intSrc == 0x0800) {
+            draw_image(sw_12_bmp);
+        } else if (intSrc == 0x1000) {
+            draw_image(sw_13_bmp);
+        } else if (intSrc == 0x2000) {
+            draw_image(sw_14_bmp);
+        } else if (intSrc == 0x4000) {
+            if (SX1509_io.digitalRead(14) == LOW) {
+                draw_image(sw_15_bmp);
+            }
+        } else if (intSrc == 0x8000) {
+            if (SX1509_io.digitalRead(15) == LOW) {
+                draw_image(sw_16_bmp);
+            }
+        } else {
+            draw_image(err_bmp);
+        }
+        sx1509_sw_0_last_trig = millis();
     }
 }
 
@@ -423,6 +514,40 @@ void analog_potentiometer_led(void)
     }
 }
 
-void loop() {
+void loop()
+{
     analog_potentiometer_led();
+
+    if (sw_0_flag) {
+        sw_0_run();
+    }
+    
+    if (enc_0_sw_flag) {
+        enc_0_sw_run();
+    }
+
+    if (enc_0_knob_flag) {
+        enc_0_knob_run();
+    }
+
+    if (enc_1_sw_flag) {
+        enc_1_sw_run();
+    }
+
+    if (enc_1_knob_flag) {
+        enc_1_knob_run();
+    }
+
+    if (enc_2_sw_flag) {
+        enc_2_sw_run();
+    }
+
+    if (enc_2_knob_flag) {
+        enc_2_knob_run();
+    }
+
+    if (sx1509_int_flag) {
+        sx1509_sw_read();
+    }
+
 }

@@ -11,6 +11,8 @@
 #ifndef ARDRUMINO_H
 #define ARDRUMINO_H
 
+const unsigned long sw_debounce_time = 10;
+
 const byte NANO_pot_0 = A0;
 const byte NANO_pot_1 = A1;
 const byte NANO_pot_2 = A2;
