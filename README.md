@@ -6,7 +6,7 @@ A lot of To-Dos to follow up on at the moment.
 
 ## Version Log
 
-### V0.0.1
+### V0.1
 
 First release containing all basic functionality I had planned for this device. Works, but needs work.
 - functioning 384 step sequencer
