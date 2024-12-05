@@ -11,6 +11,28 @@
 #ifndef ARDSEQUINO_H
 #define ARDSEQUINO_H
 
+// uncomment if potentiometer polarity is flipped, comment out otherwise
+#define FLIPPED_POTS
+
+// uncommment if LED backpack is upsidedown, comment out otherwise
+#define FLIPPED_LEDS
+
+#ifdef FLIPPED_POTS
+#define POT_MOD(x) (1023 - x)
+#endif // FLIPPED_POTENTIOMETERS
+
+#ifndef FLIPPED_POTS
+#define POT_MOD(x) (x)
+#endif // FLIPPED_POTENTIOMETERS
+
+#ifdef FLIPPED_LEDS
+#define LED_ORIENTATION 3
+#endif // FLIPPED_LEDS
+
+#ifndef FLIPPED_LEDS
+#define LED_ORIENTATION 1
+#endif // FLIPPED_LEDS
+
 #define GLOBAL_SEQUENCER_MODE 0
 #define DETAILED_PARAM_MODE 1
 
@@ -24,8 +46,10 @@
 #define MAX_PC_BANK 31
 #define MAX_MIDI_CHANNEL 16
 #define MAX_NOTES_PER_BEAT 32
-#define MAX_MIDI_NOTE 128
+#define MAX_MIDI_NOTE 127
 #define MAX_PROBABILITY 100
+
+#define DEFAULT_MIDI_CHANNEL 8
 
 #define SX1509_PIN_CT 16
 
@@ -36,37 +60,35 @@ template <typename T> void PROGMEM_readAnything (const T * sce, T& dest)
 
 template< typename T, size_t N > size_t ArraySize (T (&) [N]){ return N; }
 
-// const var declaration+definition
-
 // global debounce var
 extern const unsigned long sw_debounce_time = 30;
 
 // analog potentiometer assignment
-extern const byte NANO_pot_0 = A0;
-extern const byte NANO_pot_1 = A1;
-extern const byte NANO_pot_2 = A2;
-extern const byte NANO_pot_3 = A3;
+extern const uint8_t NANO_pot_0 = A0;
+extern const uint8_t NANO_pot_1 = A1;
+extern const uint8_t NANO_pot_2 = A2;
+extern const uint8_t NANO_pot_3 = A3;
 
 // of the 17 key switches, one is connected directly to the Nano while the rest are routed through the SX1509 GPIO expander
-extern const byte NANO_sw0_pin = 12;
+extern const uint8_t NANO_sw0_pin = 12;
 
 // encoder defintions
-extern const byte NANO_enc0_ch0 = 4;
-extern const byte NANO_enc0_ch1 = 3;
-extern const byte NANO_enc0_sw = 5;
+extern const uint8_t NANO_enc0_ch0 = 4;
+extern const uint8_t NANO_enc0_ch1 = 3;
+extern const uint8_t NANO_enc0_sw = 5;
 
-extern const byte NANO_enc1_ch0 = 7;
-extern const byte NANO_enc1_ch1 = 6;
-extern const byte NANO_enc1_sw = 8;
+extern const uint8_t NANO_enc1_ch0 = 7;
+extern const uint8_t NANO_enc1_ch1 = 6;
+extern const uint8_t NANO_enc1_sw = 8;
 
-extern const byte NANO_enc2_ch0 = 10;
-extern const byte NANO_enc2_ch1 = 9;
-extern const byte NANO_enc2_sw = 11;
+extern const uint8_t NANO_enc2_ch0 = 10;
+extern const uint8_t NANO_enc2_ch1 = 9;
+extern const uint8_t NANO_enc2_sw = 11;
 
 // SX1509 related defintions
-extern const byte SX1509_int_pin = 2;
-extern const byte SX1509_ADDR = 0x3E;
-extern const byte HT16K33_ADDR = 0x70;
+extern const uint8_t SX1509_int_pin = 2;
+extern const uint8_t SX1509_ADDR = 0x3E;
+extern const uint8_t HT16K33_ADDR = 0x70;
 
 // Begin volatile declarations for vars accessed by interrupts
 
@@ -77,9 +99,6 @@ extern volatile bool prev_enc1_ch0_state;
 extern volatile bool prev_enc1_ch1_state;
 extern volatile bool prev_enc2_ch0_state;
 extern volatile bool prev_enc2_ch1_state;
-extern volatile int8_t enc_draw_pos;
-extern volatile bool enc_usage_tracker[3];
-extern volatile bool former_enc_direction;
 
 // interrupt flags
 extern volatile bool sx1509_int_flag;
@@ -93,16 +112,16 @@ extern volatile bool enc2_sw_flag;
 
 // Each of the 14 keys/buttons will own unique sets of these properties
 typedef struct sound_properties {
-    uint8_t midi_note = 1; // 1-128
+    uint8_t midi_note = 0; // 0-127
     uint8_t volume = 127; // 0-127
-    uint8_t midi_chan = 1; // 1-16
+    uint8_t midi_chan = DEFAULT_MIDI_CHANNEL; // 1-16
     uint8_t probability = 100; // 0-100
-    uint8_t local_bpm = 0; // will automatically sync to global BPM at bootup
-    bool note_off = false;
+    bool note_off = false; // true == note-off is enabled
+    bool state = false; // true == button is actively pressed
+    uint8_t led_pos[2] = {0, 0}; // {x, y} mapping of button to LED backpack
 } sound_properties_t;
 
 typedef struct sx1509_pins {
-    uint8_t led_pos[2] = {0, 0}; // {x, y}
     unsigned long debounce = 0;
 } sx1509_pins_t;
 
@@ -121,7 +140,7 @@ typedef struct global_sequencer_menu {
     uint8_t prev_page = 0; // 0-4
     uint16_t length = 8; // 1-480
     uint8_t npb = 4; // notes per beat
-    uint8_t midi_chan = 1; // 1-16
+    uint8_t midi_chan = DEFAULT_MIDI_CHANNEL; // 1-16
     uint8_t volume = 64; // 0-127
     uint8_t attack = 0; // 0-127
     uint8_t release = 0; // 0-127
@@ -133,8 +152,9 @@ typedef struct global_sequencer_menu {
     uint8_t last_key = 0;
 } global_sequencer_menu_t;
 
+// standalone bitmaps
 extern const PROGMEM uint8_t enc0_bmp[] =
-    {
+    { // placeholder, not in use
         B11101110, B11101110,
         B10001010, B10001010,
         B11001010, B10001010,
@@ -144,8 +164,19 @@ extern const PROGMEM uint8_t enc0_bmp[] =
         B00000000, B00000000,
         B00000000, B00000000,
     },
-    enc1_bmp[] =
+    enc0_param_rst_bmp[] =
     {
+        B11001100, B11011000,
+        B10101010, B10101000,
+        B11001100, B10101000,
+        B10001010, B10101000,
+        B00000000, B00000000,
+        B11101101, B11000000,
+        B10001000, B10000000,
+        B10011000, B10000000,
+    },
+    enc1_bmp[] =
+    { // placeholder, not in use
         B11101110, B11101000,
         B10001010, B10001000,
         B11001010, B10001000,
@@ -155,7 +186,7 @@ extern const PROGMEM uint8_t enc0_bmp[] =
         B00000000, B00000000,
         B00000000, B00000000,
     },
-    enc0_note_off_en_bmp[] =
+    enc1_note_off_en_bmp[] =
     {
         B01110011, B10110110,
         B01010010, B10100100,
@@ -166,7 +197,7 @@ extern const PROGMEM uint8_t enc0_bmp[] =
         B00001010, B10100000,
         B00001110, B10100000,
     },
-    enc0_note_off_dis_bmp[] =
+    enc1_note_off_dis_bmp[] =
     {
         B01110011, B10110110,
         B01010010, B10100100,
@@ -264,19 +295,10 @@ extern const PROGMEM uint8_t enc0_bmp[] =
         B00000000, B00000000,
         B00000000, B00000000,
         B00000000, B00000000,
-    },
-    err_bmp[] =
-    {
-        B11101100, B11000000,
-        B10001010, B10100000,
-        B11001100, B11000000,
-        B10001010, B10100000,
-        B11101010, B10100000,
-        B00000000, B00000000,
-        B00000000, B00000000,
-        B00000000, B00000000,
     };
 
+// The following bitmaps are stored in an array so that they can be index-mapped
+// bitmaps for numbers in the ones place
 extern const PROGMEM uint8_t digit0[10][16] {
     {
         B00000000, B00001110,
@@ -380,6 +402,7 @@ extern const PROGMEM uint8_t digit0[10][16] {
     }
 };
 
+// bitmaps for numbers in the tens place
 extern const PROGMEM uint8_t digit1[10][16] {
     {
         B00000000, B11100000,
@@ -483,6 +506,7 @@ extern const PROGMEM uint8_t digit1[10][16] {
     }
 };
 
+// bitmaps for numbers in the hundreds place
 extern const PROGMEM uint8_t digit2[10][16] {
     {
         B00001110, B00000000,
@@ -536,6 +560,7 @@ extern const PROGMEM uint8_t digit2[10][16] {
     }
 };
 
+// bitmaps for each of 14 midi-note playing keys
 extern const PROGMEM uint8_t key_bitmap[14][16] {
     {
         B10101110, B10101110,
