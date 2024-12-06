@@ -141,7 +141,7 @@ Please read through these instructions completely before beginning assembly! And
 ![sequencer length knob](assets/Gifs/seq_len_knob.gif)\
 *A demo of the sequencer length being adjusted.*
 
-![BPM knob](assets/Gifs/BPM_knob.gif)\
+![BPM knob](assets/Gifs/bpm_knob.gif)\
 *A demo of the BPM being adjusted and reversed.*
 
 ![notes per beat knob](assets/Gifs/bpm_knob_shift.gif)\
