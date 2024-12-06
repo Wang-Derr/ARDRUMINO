@@ -1,12 +1,10 @@
 # ARD*SEQU*INO Guide
 
-![Rotating gif](assets/Gifs/rotate_side.gif)
-
 ## Assembly Instructions
 
 ### Circuit
 
-![circuit schematic](assets/Images/circuit_schematic.png)
+![circuit schematic](assets/Images/circuit_schematic.png)\
 *A schematic of the **ARD**SEQU**INO** circuit.*
 
 I wish I could provide a step-by-step breakdown of how I wired the circuit together, but, the process required multiple iterations of trial-and-error that I simply did not take the time to document. For a closer look at the circuit schematic, a file titled `circuit.cddx`, located in the `/assets` directory can be opened in [this web-based program](https://www.circuit-diagram.org/).
@@ -15,10 +13,10 @@ One note, if you plan to assemble the **ARD***SEQU***INO** with the enclosure, y
 
 ### Enclosure
 
-![enclosure_parts_labeled](assets/Images/floating_assembly.png)
+![enclosure_parts_labeled](assets/Images/floating_assembly.png)\
 *Labels for each part of the enclosure*
 
-![enclosure_parts_assembly](assets/Gifs/ardsequino_assembly.gif)
+![enclosure_parts_assembly](assets/Gifs/ardsequino_assembly.gif)\
 *A gif demonstrating the assembly process of the enclosure*
 
 Please read through these instructions completely before beginning assembly! And if you have any questions, refer to the images below for context.
@@ -41,38 +39,38 @@ Please read through these instructions completely before beginning assembly! And
 ### Pictures from the assembly process
 
 ![Upper face panel faceup](assets/Images/knobs_top.jpg)
-![Upper face panel facedown](assets/Images/knobs_bottom.jpg)
+![Upper face panel facedown](assets/Images/knobs_bottom.jpg)\
 *The **Upper face panel** with the encoders, potentiometers, and LED panel (mounted using the M2 screws and nuts) installed.*
 
-![Upper face panel wired up kinda](assets/Images/knobs_wired.jpg)
+![Upper face panel wired up kinda](assets/Images/knobs_wired.jpg)\
 *The wiring for all the encoders, potentiometers, and LED panel (partially complete).*
 
 ![Lower face panel faceup](assets/Images/keys_top.jpg)
-![Lower face panel facedown](assets/Images/keys_bottom.jpg)
+![Lower face panel facedown](assets/Images/keys_bottom.jpg)\
 *The **Lower face panel** with the key switches installed.*
 
-![Lower face panel wired kinda](assets/Images/keys_wired.jpg)
+![Lower face panel wired kinda](assets/Images/keys_wired.jpg)\
 *The wiring for all the key switches (partially complete).*
 
-![testing MIDI out](assets/Images/testing_midi.jpg)
+![testing MIDI out](assets/Images/testing_midi.jpg)\
 *Testing out MIDI output messages early on in the software development process*
 
-![proto-circuit](assets/Images/circuit_work.jpg)
+![proto-circuit](assets/Images/circuit_work.jpg)\
 *Please don't refer to this image as an exact reference for how to wire your circuit, this was early in the process and contains mistakes. But, it should give you a general idea of how I had my circuit setup.*
 
-![wiring up WAV Trigger](assets/Images/WAV_trigger_wired.jpg)
+![wiring up WAV Trigger](assets/Images/WAV_trigger_wired.jpg)\
 *My original approach to wiring up the WAV trigger, it worked, but I ended up redoing it in favor of jumper wires instead of soldered on wires. I also ended up desoldering the 9V socket so that it could sit flush with my enclosure design*
 
-![mid-assembly rear photo](assets/Images/mid-assembly_back.jpg)
+![mid-assembly rear photo](assets/Images/mid-assembly_back.jpg)\
 *How everything eventually fit together. I used a lot of jumper wires because I realized that I was overconfident in my get-it-right-on-my-first-try soldering. The green protoboards shown were used in conjunction with jumper wire headers to manage the wires in a DIY ribbon cable-like approach.*
 
-![mid-assembly top photo](assets/Images/mid-assembly_top.jpg)
+![mid-assembly top photo](assets/Images/mid-assembly_top.jpg)\
 *A mess of internal wires as seen from above.*
 
-![almost assembled side photo](assets/Images/mostly_assembled_side.jpg)
+![almost assembled side photo](assets/Images/mostly_assembled_side.jpg)\
 *A shot from the right side of the **ARD**SEQU**INO** to display the 3.5mm audio output.*
 
-![almost assembled rear photo](assets/Images/IO.jpg)
+![almost assembled rear photo](assets/Images/IO.jpg)\
 *A shot of the rear I/O panels, in the 3D models and circuit schematics I've shared, the 9V input to the right of the MIDI sockets has been removed. The MIDI sockets are input then output from right to left. Also visible is the Mini USB socket for both power and programming as well as the micro SD card slot for the WAV Trigger.*
 
 ## User Manual
@@ -119,58 +117,58 @@ Please read through these instructions completely before beginning assembly! And
 
 ### GIF Demonstrations
 
-![key demo](assets/Gifs/key_demo.gif)
+![key demo](assets/Gifs/key_demo.gif)\
 *A demo of the keys being pressed and how a corresponding LED lights up.*
 
-![track volume knob](assets/Gifs/track_vol_knob.gif)
+![track volume knob](assets/Gifs/track_vol_knob.gif)\
 *A demo of the track volume being adjusted.*
 
-![global volume knob](assets/Gifs/vol_knob.gif)
+![global volume knob](assets/Gifs/vol_knob.gif)\
 *A demo of the global volume being adjusted.*
 
-![global attack knob](assets/Gifs/atk_knob.gif)
+![global attack knob](assets/Gifs/atk_knob.gif)\
 *A demo of the attack being adjusted.*
 
-![global release knob](assets/Gifs/rel_knob.gif)
+![global release knob](assets/Gifs/rel_knob.gif)\
 *A demo of the release being adjusted.*
 
-![PC knob](assets/Gifs/pc_knob.gif)
+![PC knob](assets/Gifs/pc_knob.gif)\
 *A demo of the PC value being adjusted.*
 
-![global MIDI channel knob](assets/Gifs/pc_knob_shift.gif)
+![global MIDI channel knob](assets/Gifs/pc_knob_shift.gif)\
 *A demo of the global MIDI channel being adjusted.*
 
-![sequencer length knob](assets/Gifs/seq_len_knob.gif)
+![sequencer length knob](assets/Gifs/seq_len_knob.gif)\
 *A demo of the sequencer length being adjusted.*
 
-![BPM knob](assets/Gifs/BPM_knob.gif)
+![BPM knob](assets/Gifs/BPM_knob.gif)\
 *A demo of the BPM being adjusted and reversed.*
 
-![notes per beat knob](assets/Gifs/bpm_knob_shift.gif)
+![notes per beat knob](assets/Gifs/bpm_knob_shift.gif)\
 *A demo of the notes per beat being adjusted.*
 
-![sequencer play/pause key](assets/Gifs/seq_play_pause.gif)
+![sequencer play/pause key](assets/Gifs/seq_play_pause.gif)\
 *A demo of the sequencer being played and paused.*
 
-![sequencer record key](assets/Gifs/seq_record.gif)
+![sequencer record key](assets/Gifs/seq_record.gif)\
 *A demo of the toggling record on and off.*
 
-![sequencer live recording](assets/Gifs/seq_live_rec.gif)
+![sequencer live recording](assets/Gifs/seq_live_rec.gif)\
 *A demo of the sequencer recording midi notes while playing.*
 
-![sequencer navigation](assets/Gifs/seq_nav.gif)
+![sequencer navigation](assets/Gifs/seq_nav.gif)\
 *A demo of navigating through sequencer steps.*
 
-![switching modes](assets/Gifs/alt_menu.gif)
+![switching modes](assets/Gifs/alt_menu.gif)\
 *A demo of switching from sequencer mode to parameter menu mode.*
 
-![paramater menu mode knobs](assets/Gifs/alt_menu_enc.gif)
+![paramater menu mode knobs](assets/Gifs/alt_menu_enc.gif)\
 *A demo of the knob functions in parameter menu mode.*
 
-![reseting parameters](assets/Gifs/param_reset.gif)
+![reseting parameters](assets/Gifs/param_reset.gif)\
 *A demo of resetting the parameters of a key.*
 
-![toggle note-off on/off](assets/Gifs/noteoff_onoff.gif)
+![toggle note-off on/off](assets/Gifs/noteoff_onoff.gif)\
 *A demo of toggling note-off on/off.*
 
 ### Software Tweaks that might help you
