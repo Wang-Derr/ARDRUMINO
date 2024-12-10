@@ -58,9 +58,10 @@ This device is a sequencer with a built-in sample player. The specifications for
 
 ## Optional (but recommended) 3D modeled enclosure
 
-The files for this 3D modeled enclosure will be uploaded soon!
+You can find the `.stl` files for the enclosure [here](https://www.printables.com/model/1103677-ardsequino-enclosure)!
 
 You will also need the following hardware to secure the circuit and enclosure:
+- 17x key caps (I printed [these](https://www.printables.com/model/67474-flat-mx-keycap))
 - 9x M3 8mm screws
 - 9x M3 nuts
 - 4x M2 6mm screws
