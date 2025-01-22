@@ -17,7 +17,7 @@
 
 Adafruit_8x16matrix matrix = Adafruit_8x16matrix(); // initialize the LED panel
 SX1509 SX1509_io; // initialize the SX1509 io expander
-MIDI_CREATE_DEFAULT_INSTANCE(); // initialize MIDI comms
+MIDI_CREATE_DEFAULT_INSTANCE(); // initialize MIDI commss
 
 // encoder state vars
 volatile bool prev_enc0_ch0_state;
@@ -397,6 +397,9 @@ void encoder_led_mapping(uint8_t enc_num, bool direction) // true for clockwise,
                 if (digitalRead(NANO_sw0_pin) == LOW) {  // Change MIDI channel when shift is being held
                     matrix.fillRect(0, 0, 16, 6, LED_OFF); // Clear the top 6 LED rows, not run at the beginning of the func due to not all knobs being fully implemented at the moment
                     enc_8bit_val_calc(direction, &global_seq.midi_chan, MAX_MIDI_CHANNEL, 1);
+                    for (uint8_t i = 0; i < MAX_POLYPHONY; i++) {
+                        key_array[i].midi_chan = global_seq.midi_chan;
+                    }
                     load_bitmap(global_seq.midi_chan);
                 } else { // Change program change bank
                     matrix.fillRect(0, 0, 16, 6, LED_OFF);
@@ -609,7 +612,7 @@ void sx1509_input_handler()
                 if (digitalRead(NANO_sw0_pin) == LOW) {
                     manual_seq_control(true);
                 } else {
-                    for (int i = 0; i < MAX_POLYPHONY; i++) {
+                    for (uint8_t i = 0; i < MAX_POLYPHONY; i++) {
                         MIDI.sendNoteOff(key_array[i].midi_note, 0, key_array[i].midi_chan);
                     }
                     if (global_seq.paused) {

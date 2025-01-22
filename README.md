@@ -94,6 +94,10 @@ Not working right off the bat? You may need to tweak the software so that it wor
 
 ## Version Log
 
+### V1.1
+
+- Fix for global MIDI setting not applying to each key.
+
 ### V1.0
 
 Official release!
