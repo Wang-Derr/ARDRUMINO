@@ -645,7 +645,7 @@ void analog_potentiometer_disp(int anlg_pin_num)
 {
     draw_image(anlg_pot[anlg_pin_num].bitmap);
     int pot_level = (POT_MOD(analogRead(anlg_pot[anlg_pin_num].pinNum))/ 64);
-    if (analogRead(anlg_pot[anlg_pin_num].pinNum) > 991) {
+    if (pot_level < 1) {
         matrix.drawLine(0, 0, 15, 0, LED_OFF);
     } else {
         matrix.drawLine(0, 0, pot_level, 0, LED_ON);
@@ -723,6 +723,30 @@ void draw_sequencer_pixel()
     matrix.writeDisplay();
 }
 
+void display_sequence_page()
+{
+    switch(global_seq.page) {
+        case 0:
+            matrix.fillRect(14, 6, 2, 2, LED_OFF);
+            matrix.drawPixel(14, 6, LED_ON);
+            break;
+        case 1:
+            matrix.fillRect(14, 6, 2, 2, LED_OFF);
+            matrix.drawLine(14, 6, 15, 6, LED_ON);
+            break;
+        case 2:
+            matrix.fillRect(14, 6, 2, 2, LED_OFF);
+            matrix.drawLine(14, 6, 15, 6, LED_ON);
+            matrix.drawPixel(15, 7, LED_ON);
+            break;
+        case 3:
+            matrix.fillRect(14, 6, 2, 2, LED_ON);
+            break;
+        default:
+            break;
+    }
+}
+
 /*
  * Function: display_global_sequencer
  * Description: Displays the global sequencer menu on the LED backpack
@@ -735,26 +759,7 @@ void display_global_sequencer()
     matrix.fillRect(0, 0, 16, 6, LED_OFF); // clear sequencer portion of display
     matrix.drawPixel(global_seq.step % 16, global_seq.row % 6, LED_ON);
     if (global_seq.page != global_seq.prev_page) { // this is for tracking which page of the sequencer the user is on
-        switch(global_seq.page) {
-            case 0:
-                matrix.fillRect(14, 6, 2, 2, LED_OFF);
-                matrix.drawPixel(14, 6, LED_ON);
-                break;
-            case 1:
-                matrix.fillRect(14, 6, 2, 2, LED_OFF);
-                matrix.drawLine(14, 6, 15, 6, LED_ON);
-                break;
-            case 2:
-                matrix.fillRect(14, 6, 2, 2, LED_OFF);
-                matrix.drawLine(14, 6, 15, 6, LED_ON);
-                matrix.drawPixel(15, 7, LED_ON);
-                break;
-            case 3:
-                matrix.fillRect(14, 6, 2, 2, LED_ON);
-                break;
-            default:
-                break;
-        }
+        display_sequence_page();
         global_seq.prev_page = global_seq.page;
     }
     draw_sequencer_pixel();
@@ -816,6 +821,7 @@ void sequencer_handler()
         if (menu_mode == GLOBAL_SEQUENCER_MODE) {
             matrix.drawLine(10, 6, 10, 7, LED_ON);
             matrix.drawLine(8, 6, 8, 7, LED_ON);
+            display_sequence_page();
             matrix.writeDisplay();
         }
         return;

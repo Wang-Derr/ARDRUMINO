@@ -92,13 +92,18 @@ Not working right off the bat? You may need to tweak the software so that it wor
 - key-hold midi-note rolls
 - Sequencer setting saving
 
-## Version Log
+## Change Log
 
-### V1.1
+### V1.1.2
+
+- updated Change Log to use a more standard approach: **Semantic Versioning**
+- Fix for sequencer page tracking dissappearing after adjusting potentiometers. 
+
+### V1.0.1
 
 - Fix for global MIDI setting not applying to each key.
 
-### V1.0
+### V1.0.0
 
 Official release!
 - updated circuit schematic.
@@ -124,7 +129,7 @@ Official release!
 - Complete documentation include build instructions and user manual (probably a lot of typos).
 - Maybe more to come?
 
-### V0.1
+### V0.1.0
 
 First release containing all basic functionality I had planned for this device. Works, but needs work.
 - functioning 384 step sequencer.
