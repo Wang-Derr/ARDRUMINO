@@ -45,7 +45,7 @@
 #define MAX_BPM 255
 #define MAX_PC_BANK 31
 #define MAX_MIDI_CHANNEL 16
-#define MAX_NOTES_PER_BEAT 32
+#define MAX_NOTES_PER_BEAT 8
 #define MAX_MIDI_NOTE 127
 #define MAX_PROBABILITY 100
 
@@ -139,7 +139,7 @@ typedef struct global_sequencer_menu {
     uint8_t page = 0; // 0-4
     uint8_t prev_page = 0; // 0-4
     uint16_t length = 8; // 1-480
-    uint8_t npb = 4; // notes per beat
+    uint8_t npb = 1; // notes per beat (can be viewed as note length per sequencer step i.e. 1 npb = 1/4 notes, 2 npb = 1/8, 4 npb = 1/16 notes, etc. Similar to DAWs, each beat is treated as a 1/4 note in length)
     uint8_t midi_chan = DEFAULT_MIDI_CHANNEL; // 1-16
     uint8_t volume = 64; // 0-127
     uint8_t attack = 0; // 0-127

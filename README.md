@@ -2,7 +2,13 @@
 
 An open source Arduino based MIDI sequencer and sample player.
 
-Demo video coming soon!
+[![Walkthrough and Demo](https://img.youtube.com/vi/4isXubo1oe8/0.jpg)](https://www.youtube.com/watch?v=4isXubo1oe8)
+
+Walkthrough and demo!
+
+[![Sequencing External Gear](https://img.youtube.com/vi/dgfwL1yj6mA/0.jpg)](https://www.youtube.com/watch?v=dgfwL1yj6mA)
+
+Demonstrating sequencing external hardware!
 
 ## Description
 
@@ -21,6 +27,7 @@ This device is a sequencer with a built-in sample player. The specifications for
 - Global MIDI channel control
 - BPM control (45-300), reversable as well
   - programmable note per beat division
+  - 1 beat == 1/4 note
 - MIDI program change bank control (0-31 by default but expandable in software, limited to 32 because of the WAV Trigger)
 - 14 voices (midi-note assignable keys)
 - Per key volume control
@@ -28,6 +35,7 @@ This device is a sequencer with a built-in sample player. The specifications for
 - Per key sequence probability control
 - Full MIDI output capabilities
 - Limited MIDI input capabilities, supports control of the WAV Trigger via MIDI input but not control of the sequencer
+- Up to 32 GBs of sample storage (on a user provided micro SD card).
 
 ## Required Arduino Libraries
 
@@ -46,6 +54,7 @@ This device is a sequencer with a built-in sample player. The specifications for
 - 2x [6N138 Octocouplers](https://www.amazon.com/gp/product/B09C8T7V6V)
 - 2x [MIDI DIN sockets](https://www.amazon.com/gp/product/B01GBT9RC0)
 - 1x [WAV Trigger](https://www.robertsonics.com/wav-trigger/)
+- 1x micro SD card, please refer to the WAV Trigger's site listed above for the specs
 - 4x [10k Ohm rotary potentiometers](https://www.amazon.com/gp/product/B00MCK7JMS)
 - 3x [5-pin rotary encoders](https://www.amazon.com/gp/product/B07DM2YMT4)
 - 17x [mechanical switches](https://www.amazon.com/gp/product/B0BXZXZX74)
@@ -90,11 +99,25 @@ Not working right off the bat? You may need to tweak the software so that it wor
 - swing
 - Per key BPM control (polyrythms?)
 - key-hold midi-note rolls
-- Sequencer setting saving
+- Sequencer setting saving (currently does not persist between power-cycles)
+- per MIDI channel sequencing
+- Set MIDI note off markers (or just have MIDI notes persist without replaying)
 
 ## Change Log
 
-### V1.1.2
+## V1.1.1
+
+- Fixed version numbering
+- Fixed math converting BPM to milliseconds between notes
+  - clarified how BPM and notes per beat are correlated as well
+- Fixed math calculating microseconds between MIDI clock signals
+- Fixed MIDI clock start/stop, was flipped
+- Fixed note-off being triggered while sequencer is playing
+- Fixed sequencer not playing when key parameter menu is open
+- Added more future goals
+- Linked videos in the README to demonstrate the ARDSEQUINO
+
+### V1.1.0
 
 - updated Change Log to use a more standard approach: **Semantic Versioning**
 - Fix for sequencer page tracking dissappearing after adjusting potentiometers. 

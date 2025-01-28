@@ -74,8 +74,8 @@ uint8_t menu_mode = GLOBAL_SEQUENCER_MODE;
 // BPM related vars
 unsigned long prev_seq_time = millis(); // tracks last sequencer step timing
 unsigned long prev_clock_tick = micros(); // tracks midi clock signal
-unsigned long bpm_as_ms = 60000 / (global_seq.bpm + 45) / global_seq.npb; // converts BPM to ms per sequencer step
-unsigned long us_per_tick = 60000000 / (global_seq.bpm + 45) / 4 / 24; // calculate microseconds per quarternote for midi clock sync based on bpm
+unsigned long ms_between_notes = 60000 / ((global_seq.bpm + 45) * global_seq.npb); // converts BPM to ms per sequencer step
+unsigned long us_between_midi_clock_sig = 60000000 / ((global_seq.bpm + 45) * 24); // calculate microseconds per quarternote for midi clock sync based on bpm
 
 // buffers for loading data stored in program memory
 uint8_t digit0_buf[16];
@@ -422,13 +422,14 @@ void encoder_led_mapping(uint8_t enc_num, bool direction) // true for clockwise,
                     matrix.fillRect(0, 0, 16, 6, LED_OFF);
                     enc_8bit_val_calc(direction, &global_seq.npb, MAX_NOTES_PER_BEAT, 1);
                     load_bitmap(global_seq.npb);
-                    bpm_as_ms = 60000 / (global_seq.bpm + 45) / global_seq.npb;
+                    ms_between_notes = 60000 / ((global_seq.bpm + 45) * global_seq.npb);
                 } else { // Adjust the BPM
                     matrix.fillRect(0, 0, 16, 6, LED_OFF);
                     enc_8bit_val_calc(direction, &global_seq.bpm, MAX_BPM, 0);
                     load_bitmap(global_seq.bpm + 45);
                     bpm_direction();
-                    bpm_as_ms = 60000 / (global_seq.bpm + 45) / global_seq.npb;
+                    ms_between_notes = 60000 / ((global_seq.bpm + 45) * global_seq.npb);
+                    us_between_midi_clock_sig = 60000000 / ((global_seq.bpm + 45) * 24);
                 }
                 break;
             default:
@@ -617,11 +618,11 @@ void sx1509_input_handler()
                     }
                     if (global_seq.paused) {
                         global_seq.paused = false;
-                        MIDI.sendStop();
-                    } else {
-                        global_seq.paused = true;
                         MIDI.sendStart();
                         prev_clock_tick = micros();
+                    } else {
+                        global_seq.paused = true;
+                        MIDI.sendStop();
                     }
                 }
             }
@@ -829,24 +830,27 @@ void sequencer_handler()
         matrix.fillRect(8, 6, 3, 2, LED_OFF);
     }
     //do math for bpm and transition LEDs to next step
-    if (((micros() - prev_clock_tick) >= us_per_tick) || (micros() < prev_clock_tick)) {
+    if (((micros() - prev_clock_tick) >= us_between_midi_clock_sig) || (micros() < prev_clock_tick)) {
         MIDI.sendClock();
         prev_clock_tick = micros();
     }
-    if ((millis() - prev_seq_time) >= bpm_as_ms) {
+    if ((millis() - prev_seq_time) >= ms_between_notes) {
         // increment sequencer steps
         global_sequencer_tracker(global_seq.direction);
         if (menu_mode == GLOBAL_SEQUENCER_MODE) {
             display_global_sequencer();
-            for (uint8_t i = 0; i < MAX_POLYPHONY; i++) { // checks current sequencer step for any programmed midi notes
-                if ((0x0001 & (sequencer_array[global_seq.step] >> i)) && ((uint8_t) random(1, 100) < key_array[i].probability)) {
-                    MIDI.sendNoteOn(key_array[i].midi_note, key_array[i].volume, key_array[i].midi_chan);
-                }
-            }
         } else if (menu_mode == DETAILED_PARAM_MODE) {
             // WIP related to button-specific BPM
         }
-        prev_seq_time = millis();
+        for (uint8_t i = 0; i < MAX_POLYPHONY; i++) { // checks current sequencer step for any programmed midi notes
+            if (key_array[i].note_off) { // turn off previous notes if "note-off" mode is on
+                MIDI.sendNoteOff(key_array[i].midi_note, 0, key_array[i].midi_chan);
+            }
+            if ((0x0001 & (sequencer_array[global_seq.step] >> i)) && ((uint8_t) random(1, 100) < key_array[i].probability)) {
+                MIDI.sendNoteOn(key_array[i].midi_note, key_array[i].volume, key_array[i].midi_chan);
+            }
+        }
+    prev_seq_time = millis();
     }
 }
 
